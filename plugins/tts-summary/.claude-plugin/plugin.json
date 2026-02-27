@@ -1,0 +1,8 @@
+{
+  "name": "tts-summary",
+  "description": "Speaks a one-sentence TTS summary of what Claude did after each task using edge-tts",
+  "version": "1.0.0",
+  "author": {
+    "name": "Sean O'Reilly"
+  }
+}

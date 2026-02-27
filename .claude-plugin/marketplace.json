@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "sean-plugins",
+  "owner": {
+    "name": "Sean O'Reilly"
+  },
+  "plugins": [
+    {
+      "name": "tts-summary",
+      "source": "./plugins/tts-summary",
+      "description": "Speaks a one-sentence TTS summary of what Claude did after each task",
+      "version": "1.0.0",
+      "category": "productivity"
+    }
+  ]
+}
