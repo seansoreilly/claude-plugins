@@ -2,47 +2,27 @@
 set -euo pipefail
 
 # Stop hook: summarise what Claude did in one sentence, then speak it via TTS.
-# Reads hook JSON from stdin, parses transcript, calls OpenRouter API (haiku) for summary.
+# Uses last_assistant_message from hook input (no transcript parsing needed).
+# Calls OpenRouter API (haiku) for summary, then speaks via edge-tts.
 
 PLUGIN_DIR="$(cd "$(dirname "$0")" && pwd)"
+DEBUG_LOG="/tmp/claude-tts-debug.log"
 
 [[ "${CLAUDE_TTS_ENABLED:-1}" == "0" ]] && exit 0
 
 INPUT=$(cat)
-TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // ""')
-CWD=$(echo "$INPUT" | jq -r '.cwd // ""')
-TMP_DIR="${CWD:+$CWD/tmp}"
-TMP_DIR="${TMP_DIR:-/tmp}"
-DEBUG_LOG="$TMP_DIR/claude-tts-debug.log"
 
-if [[ -z "$TRANSCRIPT" || ! -f "$TRANSCRIPT" ]]; then
-  "$PLUGIN_DIR/speak.sh" "Ready" &
-  exit 0
-fi
+# Extract last assistant message directly from hook input
+LAST_MSG=$(echo "$INPUT" | jq -r '.last_assistant_message // ""' | head -c 2000)
 
-# Extract the last assistant message text from the JSONL transcript.
-# Reverse line order (tac on Linux, tail -r on macOS); process line-by-line so jq parses valid JSON per line.
-reverse_cmd() { if command -v tac >/dev/null 2>&1; then tac "$1"; else tail -r "$1"; fi; }
-LAST_MSG=$(reverse_cmd "$TRANSCRIPT" | while IFS= read -r line; do
-  text=$(echo "$line" | jq -r 'select(.type == "assistant") | .message.content[]? | select(.type == "text") | .text' 2>/dev/null)
-  if [[ -n "$text" ]]; then
-    echo "$text"
-    break
-  fi
-done | head -c 2000)
-
-# Debug logging when enabled
-if [[ "${CLAUDE_HOOK_DEBUG:-0}" == "1" ]]; then
-  mkdir -p "$TMP_DIR"
-  {
-    echo "--- $(date '+%Y-%m-%dT%H:%M:%S%z') ---"
-    echo "TRANSCRIPT: $TRANSCRIPT"
-    echo "LAST_MSG length: ${#LAST_MSG}"
-    echo "LAST_MSG preview: ${LAST_MSG:0:200}"
-  } >> "$DEBUG_LOG"
-fi
+{
+  echo "=== HOOK FIRED $(date '+%Y-%m-%dT%H:%M:%S%z') ==="
+  echo "LAST_MSG length: ${#LAST_MSG}"
+  echo "LAST_MSG preview: ${LAST_MSG:0:200}"
+} >> "$DEBUG_LOG"
 
 if [[ -z "$LAST_MSG" ]]; then
+  echo "No last_assistant_message, saying Ready" >> "$DEBUG_LOG"
   "$PLUGIN_DIR/speak.sh" "Ready" &
   exit 0
 fi
@@ -58,6 +38,7 @@ if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
 fi
 
 if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
+  echo "No OPENROUTER_API_KEY found, saying Ready" >> "$DEBUG_LOG"
   "$PLUGIN_DIR/speak.sh" "Ready" &
   exit 0
 fi
@@ -80,13 +61,10 @@ API_RESPONSE=$(curl -s --max-time 8 \
 
 SUMMARY=$(echo "$API_RESPONSE" | jq -r '.choices[0].message.content // ""' 2>/dev/null)
 
-if [[ "${CLAUDE_HOOK_DEBUG:-0}" == "1" ]]; then
-  {
-    echo "API_KEY length: ${#OPENROUTER_API_KEY}"
-    echo "API_RESPONSE: $API_RESPONSE"
-    echo "SUMMARY: $SUMMARY"
-  } >> "$DEBUG_LOG"
-fi
+{
+  echo "API_KEY found: yes (${#OPENROUTER_API_KEY} chars)"
+  echo "SUMMARY: $SUMMARY"
+} >> "$DEBUG_LOG"
 
 if [[ -n "$SUMMARY" ]]; then
   "$PLUGIN_DIR/speak.sh" "$SUMMARY" &

@@ -9,7 +9,7 @@
       "name": "tts-summary",
       "source": "./plugins/tts-summary",
       "description": "Speaks a one-sentence TTS summary of what Claude did after each task",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "category": "productivity"
     },
     {
