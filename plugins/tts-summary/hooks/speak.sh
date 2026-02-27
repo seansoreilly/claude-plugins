@@ -33,7 +33,9 @@ TMPFILE="/tmp/claude-tts-$$.mp3"
     --write-media "$TMPFILE" 2>/dev/null
 
   if [[ -f "$TMPFILE" ]]; then
-    if command -v mpv >/dev/null 2>&1; then
+    if command -v afplay >/dev/null 2>&1; then
+      afplay "$TMPFILE"
+    elif command -v mpv >/dev/null 2>&1; then
       mpv --no-video --volume=70 "$TMPFILE" 2>/dev/null
     elif command -v ffplay >/dev/null 2>&1; then
       ffplay -nodisp -autoexit -loglevel error "$TMPFILE" 2>/dev/null

@@ -21,8 +21,9 @@ if [[ -z "$TRANSCRIPT" || ! -f "$TRANSCRIPT" ]]; then
 fi
 
 # Extract the last assistant message text from the JSONL transcript.
-# tac reverses line order; we process line-by-line so jq parses valid JSON per line.
-LAST_MSG=$(tac "$TRANSCRIPT" | while IFS= read -r line; do
+# Reverse line order (tac on Linux, tail -r on macOS); process line-by-line so jq parses valid JSON per line.
+reverse_cmd() { if command -v tac >/dev/null 2>&1; then tac "$1"; else tail -r "$1"; fi; }
+LAST_MSG=$(reverse_cmd "$TRANSCRIPT" | while IFS= read -r line; do
   text=$(echo "$line" | jq -r 'select(.type == "assistant") | .message.content[]? | select(.type == "text") | .text' 2>/dev/null)
   if [[ -n "$text" ]]; then
     echo "$text"
@@ -34,7 +35,7 @@ done | head -c 2000)
 if [[ "${CLAUDE_HOOK_DEBUG:-0}" == "1" ]]; then
   mkdir -p "$TMP_DIR"
   {
-    echo "--- $(date -Iseconds) ---"
+    echo "--- $(date '+%Y-%m-%dT%H:%M:%S%z') ---"
     echo "TRANSCRIPT: $TRANSCRIPT"
     echo "LAST_MSG length: ${#LAST_MSG}"
     echo "LAST_MSG preview: ${LAST_MSG:0:200}"
@@ -50,7 +51,7 @@ fi
 if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
   for ENV_FILE in "${HOME}/projects/config/.env" "${HOME}/.env" ".env"; do
     if [[ -f "$ENV_FILE" ]]; then
-      OPENROUTER_API_KEY=$(grep -oP '^(VITE_)?OPENROUTER_API_KEY=\K.*' "$ENV_FILE" | tr -d '"' | tr -d $'\r' | head -1 || true)
+      OPENROUTER_API_KEY=$(grep -E '^(VITE_)?OPENROUTER_API_KEY=' "$ENV_FILE" | head -1 | sed 's/^[^=]*=//' | tr -d '"' | tr -d $'\r' || true)
       [[ -n "${OPENROUTER_API_KEY:-}" ]] && break
     fi
   done
