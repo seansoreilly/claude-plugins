@@ -1,0 +1,8 @@
+{
+  "name": "dev-workflow",
+  "description": "Development workflow commands and skills: conventional commits, orchestrated implementation, safe implementation with loop detection, comprehensive UI testing, and AI image generation via Nano Banana",
+  "version": "1.0.0",
+  "author": {
+    "name": "Sean O'Reilly"
+  }
+}

@@ -11,6 +11,13 @@
       "description": "Speaks a one-sentence TTS summary of what Claude did after each task",
       "version": "1.0.0",
       "category": "productivity"
+    },
+    {
+      "name": "dev-workflow",
+      "source": "./plugins/dev-workflow",
+      "description": "Development workflow commands (commit, orchestrate, safe-implementation, test-ui) and skills (nano-banana image generation)",
+      "version": "1.0.0",
+      "category": "development"
     }
   ]
 }
