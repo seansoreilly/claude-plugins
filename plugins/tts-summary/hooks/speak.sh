@@ -27,6 +27,11 @@ fi
 # Generate unique temp file
 TMPFILE="/tmp/claude-tts-$$.mp3"
 
+# WSLg PulseAudio support
+if [[ -z "${PULSE_SERVER:-}" && -S /mnt/wslg/PulseServer ]]; then
+  export PULSE_SERVER=/mnt/wslg/PulseServer
+fi
+
 # Run in background to avoid blocking Claude
 {
   edge-tts --text "$TEXT" --voice "$VOICE" --rate "$RATE" \
@@ -41,6 +46,15 @@ TMPFILE="/tmp/claude-tts-$$.mp3"
       ffplay -nodisp -autoexit -loglevel error "$TMPFILE" 2>/dev/null
     elif command -v mpg123 >/dev/null 2>&1; then
       mpg123 -q "$TMPFILE"
+    elif python3 -c "import pygame" 2>/dev/null; then
+      python3 -c "
+import pygame, time
+pygame.mixer.init()
+pygame.mixer.music.load('$TMPFILE')
+pygame.mixer.music.play()
+while pygame.mixer.music.get_busy():
+    time.sleep(0.1)
+" 2>/dev/null
     fi
     rm -f "$TMPFILE"
   fi
