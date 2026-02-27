@@ -10,6 +10,17 @@
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "matcher": "input required|awaiting your input|await input|user input|Ready for input",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tts_summary.sh"
+          }
+        ]
+      }
     ]
   }
 }
