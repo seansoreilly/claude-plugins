@@ -18,6 +18,13 @@
       "description": "Development workflow commands (commit, orchestrate, safe-implementation, test-ui) and skills (nano-banana image generation)",
       "version": "1.0.0",
       "category": "development"
+    },
+    {
+      "name": "clean",
+      "source": "./plugins/clean",
+      "description": "Evidence-based codebase cleanup with parallel analysis, risk classification (safe/probably-safe/risky/structural), and safety verification",
+      "version": "1.0.0",
+      "category": "development"
     }
   ]
 }

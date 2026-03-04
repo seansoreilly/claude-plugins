@@ -1,0 +1,8 @@
+{
+  "name": "clean",
+  "description": "Evidence-based codebase cleanup with parallel analysis, risk classification, and safety verification",
+  "version": "1.0.0",
+  "author": {
+    "name": "Sean O'Reilly"
+  }
+}
