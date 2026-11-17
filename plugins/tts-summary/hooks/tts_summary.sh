@@ -10,6 +10,13 @@ DEBUG_LOG="/tmp/claude-tts-debug.log"
 
 [[ "${CLAUDE_TTS_ENABLED:-1}" == "0" ]] && exit 0
 
+# Skip if voice mode is enabled (built-in voice handles TTS)
+SETTINGS_FILE="${HOME}/.claude/settings.json"
+if [[ -f "$SETTINGS_FILE" ]]; then
+  VOICE_ENABLED=$(jq -r '.voiceEnabled // false' "$SETTINGS_FILE" 2>/dev/null)
+  [[ "$VOICE_ENABLED" == "true" ]] && exit 0
+fi
+
 INPUT=$(cat)
 
 # Extract last assistant message directly from hook input
