@@ -59,11 +59,15 @@ For each stage, follow this loop:
 
 | Model | Use when | Examples |
 |-------|----------|----------|
-| **Opus** | Complex logic, architectural decisions, nuanced refactors, multi-file reasoning | Designing a new module, complex bug diagnosis, migration with business logic |
-| **Sonnet** | Standard implementation, moderate complexity, most coding tasks | CRUD endpoints, component creation, config changes, test writing |
-| **Haiku** | Simple/mechanical tasks, boilerplate, search/research, file scaffolding | Renaming, formatting, simple find-and-replace, reading files for context, generating repetitive code |
+| **Opus** (`claude-opus-5`) | The exception: architectural decisions, tricky multi-file debugging | Designing a new module, complex bug diagnosis, migration with business logic |
+| **Sonnet** (`claude-sonnet-5`) | **The default.** Near-Opus quality on coding and agentic work — real implementation, not just simple edits | CRUD endpoints, component creation, config changes, test writing, most refactors |
+| **Haiku** (`claude-haiku-4-5`) | Simple/mechanical tasks, boilerplate, search/research, file scaffolding | Renaming, formatting, simple find-and-replace, reading files for context, generating repetitive code |
 
-Pass the `model` parameter to the Task tool (e.g., `model: "haiku"`, `model: "sonnet"`, `model: "opus"`). Default to **Sonnet** when unsure. Prefer **Haiku** for research-only subagents that don't write code. Use **Opus** sparingly for genuinely complex substages.
+Pass the `model` parameter to the Task tool (e.g., `model: "haiku"`, `model: "sonnet"`, `model: "opus"`). **Default to Sonnet** — it now handles most substages that previously warranted Opus. Prefer **Haiku** for research-only subagents that don't write code. Escalate to **Opus** only when the substage individually demands it.
+
+**Effort** is the other dial, independent of model choice — often a bigger quality/cost lever. Default is `high`; set it deliberately: `low` for research/mechanical substages, `medium` for routine implementation, `xhigh` for the hardest coding work. Reserve `max` for cases where correctness outweighs cost.
+
+**Don't over-delegate.** Each subagent re-establishes context, re-explores, and reports back, and you then re-read the report. If you could finish a substage yourself in a handful of tool calls, do it directly. Never spawn a subagent purely to verify or double-check your own work — verification belongs in the main loop (Phase 1d).
 
 **Subagent instructions template**:
 ```
@@ -115,8 +119,9 @@ After build passes:
    Changes:
    - [bullet list of changes]
 
-   Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+   Co-Authored-By: Claude <noreply@anthropic.com>
    ```
+   (Use the model actually running this orchestration in the trailer if you want it attributed — don't copy a stale version number.)
 3. Report commit hash in progress update
 
 ### 1f. Stage Completion
