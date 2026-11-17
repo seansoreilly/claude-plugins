@@ -1,3 +1,7 @@
+---
+description: Create a git commit with an automatically generated conventional commit message
+---
+
 # Automatic Conventional Git Commit
 
 Create a git commit with an automatically generated conventional commit message.

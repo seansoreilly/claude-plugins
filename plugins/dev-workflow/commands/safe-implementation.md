@@ -1,3 +1,7 @@
+---
+description: Implement features safely with parallelization, loop detection and automatic recovery
+---
+
 # Safe Implementation Workflow with Loop Detection and Recovery
 
 You are implementing features using safe development practices with intelligent parallelization, loop detection, and automatic recovery mechanisms.

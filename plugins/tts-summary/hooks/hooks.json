@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tts_summary.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/tts_summary.sh\""
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/tts_summary.sh"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/tts_summary.sh\""
           }
         ]
       }

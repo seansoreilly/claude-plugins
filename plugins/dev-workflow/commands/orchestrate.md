@@ -1,5 +1,4 @@
 ---
-allowed-tools: all
 description: Orchestrated implementation with subagents, commits, progress updates, and loop detection
 ---
 
